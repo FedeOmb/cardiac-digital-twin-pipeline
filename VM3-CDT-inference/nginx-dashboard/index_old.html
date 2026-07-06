@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cardiac Digital Twin — Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --bg:#f5f4f0;--surface:#fafaf7;--surface-2:#fff;--surface-off:#edecea;
+      --border:oklch(0.3 0.01 80/.12);
+      --text:#1a1916;--muted:#6b6a67;--faint:#b0afa9;
+      --primary:#01696f;--primary-h:#0c4e54;--primary-hl:#d0e0de;
+      --success:#437a22;--success-hl:#d4dfcc;
+      --error:#a12c4a;--error-hl:#e0ced4;
+      --warning:#964219;
+      --sh-sm:0 1px 2px oklch(0.2 0.01 80/.06);
+      --sh-md:0 4px 12px oklch(0.2 0.01 80/.08);
+      --sh-lg:0 12px 32px oklch(0.2 0.01 80/.12);
+      --r-sm:.375rem;--r-md:.5rem;--r-lg:.75rem;--r-xl:1rem;
+      --font:'Inter',system-ui,sans-serif;
+      --mono:'JetBrains Mono',monospace;
+      --tr:160ms cubic-bezier(.16,1,.3,1);
+    }
+    [data-theme="dark"]{
+      --bg:#111110;--surface:#181715;--surface-2:#1e1d1b;--surface-off:#252421;
+      --border:oklch(1 0 0/.08);
+      --text:#d4d3d0;--muted:#7a7976;--faint:#4e4d4b;
+      --primary:#4fa8b3;--primary-h:#2d8e99;--primary-hl:#1e3336;
+      --success:#6daa45;--success-hl:#1e2e17;
+      --error:#d16080;--error-hl:#2e1520;
+      --warning:#d4844a;
+      --sh-sm:0 1px 3px oklch(0 0 0/.25);
+      --sh-md:0 4px 14px oklch(0 0 0/.35);
+      --sh-lg:0 12px 36px oklch(0 0 0/.45);
+    }
+    @media(prefers-color-scheme:dark){
+      :root:not([data-theme]){
+        --bg:#111110;--surface:#181715;--surface-2:#1e1d1b;--surface-off:#252421;
+        --border:oklch(1 0 0/.08);--text:#d4d3d0;--muted:#7a7976;--faint:#4e4d4b;
+        --primary:#4fa8b3;--primary-h:#2d8e99;--primary-hl:#1e3336;
+        --success:#6daa45;--success-hl:#1e2e17;--error:#d16080;--warning:#d4844a;
+        --sh-sm:0 1px 3px oklch(0 0 0/.25);--sh-md:0 4px 14px oklch(0 0 0/.35);
+      }
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+    body{min-height:100dvh;font-family:var(--font);font-size:clamp(1rem,.95rem + .25vw,1.125rem);
+         color:var(--text);background:var(--bg);line-height:1.6;
+         display:grid;grid-template-rows:auto 1fr auto}
+    a,button{transition:color var(--tr),background var(--tr),box-shadow var(--tr),border-color var(--tr)}
+    button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+    :focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:var(--r-sm)}
+
+    .wrap{max-width:1040px;margin-inline:auto;padding-inline:1.5rem}
+
+    /* Header */
+    header{border-bottom:1px solid var(--border);background:var(--surface);
+           position:sticky;top:0;z-index:100}
+    .hdr{display:flex;align-items:center;gap:1rem;padding-block:.875rem}
+    .logo{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--text)}
+    .logo-mark{width:34px;height:34px;flex-shrink:0}
+    .logo-name{font-size:.9375rem;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+    .logo-sub{font-size:.75rem;color:var(--muted);font-weight:400}
+    .hdr-space{flex:1}
+    .toggle{width:34px;height:34px;border-radius:var(--r-md);display:grid;place-items:center;
+            color:var(--muted);border:1px solid var(--border)}
+    .toggle:hover{color:var(--text);background:var(--surface-off)}
+
+    /* Pipeline strip */
+    .pipeline{background:var(--surface-off);border-bottom:1px solid var(--border);
+               overflow-x:auto;scrollbar-width:none}
+    .pipeline::-webkit-scrollbar{display:none}
+    .steps{display:flex;align-items:center;padding:.625rem 1.5rem;width:max-content;min-width:100%}
+    .step{display:flex;align-items:center;gap:.375rem;padding:.375rem .625rem;
+          border-radius:var(--r-md);font-size:.75rem;font-weight:500;
+          color:var(--muted);white-space:nowrap}
+    .step.vm1{color:var(--primary);background:var(--primary-hl)}
+    .step.vm2{color:#d4844a;background:color-mix(in oklch,#d4844a 15%,var(--surface-off))}
+    .step.vm3{color:#6daa45;background:color-mix(in oklch,#6daa45 15%,var(--surface-off))}
+    .snum{width:17px;height:17px;border-radius:9999px;background:var(--surface-2);
+          border:1px solid var(--border);display:grid;place-items:center;
+          font-size:.625rem;font-weight:700;font-family:var(--mono)}
+    .step.vm1 .snum{background:var(--primary);color:#fff;border-color:transparent}
+    .step.vm2 .snum{background:#d4844a;color:#fff;border-color:transparent}
+    .step.vm3 .snum{background:#6daa45;color:#fff;border-color:transparent}
+    .arr{color:var(--faint);padding-inline:.5rem;font-size:.75rem}
+
+    /* VM legend */
+    .legend{display:flex;gap:1rem;align-items:center;padding-block:1.5rem 0;flex-wrap:wrap}
+    .leg-item{display:flex;align-items:center;gap:.375rem;font-size:.75rem;color:var(--muted)}
+    .leg-dot{width:8px;height:8px;border-radius:9999px;flex-shrink:0}
+
+    /* Grid servizi */
+    main{padding-block:2rem 3rem}
+    .vm-section{margin-bottom:2.5rem}
+    .vm-label{font-size:.6875rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+               color:var(--faint);margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+    .vm-label::after{content:'';flex:1;height:1px;background:var(--border)}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:1rem}
+
+    /* Card */
+    .card{
+      background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
+      padding:1.375rem;box-shadow:var(--sh-sm);display:flex;flex-direction:column;gap:1rem;
+      text-decoration:none;color:inherit;
+      transition:box-shadow var(--tr),border-color var(--tr),transform var(--tr);
+    }
+    .card:hover{box-shadow:var(--sh-md);transform:translateY(-1px);
+      border-color:oklch(from var(--primary) l c h/.35)}
+    .card:active{transform:translateY(0)}
+
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem}
+    .card-icon{width:38px;height:38px;border-radius:var(--r-lg);background:var(--surface-off);
+               display:grid;place-items:center;flex-shrink:0}
+    .card-icon svg{width:19px;height:19px;stroke:var(--muted)}
+
+    /* Status pill */
+    .status{display:flex;align-items:center;gap:.3rem;
+            font-size:.6875rem;font-weight:600;font-family:var(--mono);
+            padding:3px .5rem;border-radius:9999px;border:1px solid var(--border);
+            background:var(--surface-off);color:var(--muted);white-space:nowrap}
+    .status-led{width:6px;height:6px;border-radius:9999px;background:var(--faint)}
+    .status.online  .status-led{background:var(--success)}
+    .status.offline .status-led{background:var(--error)}
+    .status.checking .status-led{background:var(--warning);
+      animation:blink 1.2s ease-in-out infinite}
+    .status.online{color:var(--success);background:var(--success-hl);border-color:transparent}
+    .status.offline{color:var(--error);background:var(--error-hl);border-color:transparent}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .card-title{font-size:1rem;font-weight:600;margin-bottom:2px}
+    .card-desc{font-size:.875rem;color:var(--muted);line-height:1.5}
+    .card-meta{display:flex;align-items:center;gap:.375rem;margin-top:auto;flex-wrap:wrap}
+    .badge{font-size:.6875rem;font-weight:500;font-family:var(--mono);
+           padding:2px .4rem;border-radius:var(--r-sm);
+           background:var(--surface-off);color:var(--muted)}
+    .badge.accent{background:var(--primary-hl);color:var(--primary)}
+    .open-lnk{margin-left:auto;font-size:.75rem;font-weight:600;color:var(--primary);
+               display:flex;align-items:center;gap:3px}
+    .open-lnk svg{width:11px;height:11px}
+    .card:hover .open-lnk{color:var(--primary-h)}
+
+    /* Disabled card (torso — non containerizzato) */
+    .card.disabled{opacity:.55;pointer-events:none;cursor:default}
+
+    /* Footer */
+    footer{border-top:1px solid var(--border);padding-block:1.25rem}
+    .foot{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    .foot-text{font-size:.75rem;color:var(--faint)}
+    .foot-links{display:flex;gap:1rem}
+    .foot-links a{font-size:.75rem;color:var(--faint);text-decoration:none}
+    .foot-links a:hover{color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="wrap">
+    <div class="hdr">
+      <a class="logo" href="/">
+        <!-- Logo SVG: ECG heartbeat stilizzato -->
+        <svg class="logo-mark" viewBox="0 0 34 34" fill="none" aria-label="CDT">
+          <rect width="34" height="34" rx="7" fill="currentColor" opacity=".07"/>
+          <polyline points="3,17 9,17 12,9 15,25 18,13 21,21 24,17 31,17"
+            stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div class="logo-name">Cardiac Digital Twin</div>
+          <div class="logo-sub">Pipeline Hub</div>
+        </div>
+      </a>
+      <div class="hdr-space"></div>
+      <button class="toggle" data-theme-toggle aria-label="Cambia tema"></button>
+    </div>
+  </div>
+</header>
+
+<!-- Pipeline strip -->
+<div class="pipeline">
+  <div class="steps wrap">
+    <div class="step vm1"><div class="snum">1</div>BiV-ME Mesh</div>
+    <span class="arr">›</span>
+    <div class="step vm2"><div class="snum">2</div>CobiVeco / Fibre</div>
+    <span class="arr">›</span>
+    <div class="step"><div class="snum">3</div>Torso &amp; Elettrodi</div>
+    <span class="arr">›</span>
+    <div class="step vm3"><div class="snum">4</div>CDT Inference</div>
+    <span class="arr">›</span>
+    <div class="step"><div class="snum">5</div>openCARP</div>
+  </div>
+</div>
+
+<!-- Main -->
+<main>
+  <div class="wrap">
+
+    <!-- Legenda VM -->
+    <div class="legend">
+      <span class="leg-item"><span class="leg-dot" style="background:var(--primary)"></span>VM1 — questo host</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#d4844a"></span>VM2 — MATLAB</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#6daa45"></span>VM3 — CDT Inference</span>
+    </div>
+
+    <!-- VM1 -->
+    <div class="vm-section" style="margin-top:1.75rem">
+      <div class="vm-label">VM1 — BiV-ME</div>
+      <div class="cards">
+
+        <a class="card" href="/biv-me/lab/" target="_blank" rel="noopener"
+           data-health="/bivme/lab/api/health">
+          <div class="card-top">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <ellipse cx="12" cy="12" rx="10" ry="10"/>
+                <path d="M8 12c0-2.21 1.79-4 4-4s4 1.79 4 4"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+              </svg>
+            </div>
+            <div class="status checking" aria-live="polite">
+              <div class="status-led"></div><span>verifica...</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-title">BiV-ME Mesh</div>
+            <div class="card-desc">Segmentazione CMR e generazione mesh biventricolare. Notebook JupyterLab.</div>
+          </div>
+          <div class="card-meta">
+            <span class="badge">Jupyter</span>
+            <span class="badge accent">Stage 1</span>
+            <span class="open-lnk">Apri
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2.5 9.5l7-7M4 2.5h5.5v5.5"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- VM2 -->
+    <div class="vm-section">
+      <div class="vm-label">VM2 — MATLAB / CobiVeco</div>
+      <div class="cards">
+
+        <a class="card" href="/matlab/" target="_blank" rel="noopener"
+           data-health="/matlab/">
+          <div class="card-top">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M8 8l3 4-3 4M13 16h3"/>
+              </svg>
+            </div>
+            <div class="status checking" aria-live="polite">
+              <div class="status-led"></div><span>verifica...</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-title">CobiVeco &amp; LdRb</div>
+            <div class="card-desc">Coordinate CobiVeco, fibre ventricolari coarse e fine. Interfaccia web MATLAB.</div>
+          </div>
+          <div class="card-meta">
+            <span class="badge">MATLAB</span>
+            <span class="badge accent">Stage 2</span>
+            <span class="open-lnk">Apri
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2.5 9.5l7-7M4 2.5h5.5v5.5"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Stage 3 — esterno -->
+    <div class="vm-section">
+      <div class="vm-label">Esterno — Torso &amp; Elettrodi</div>
+      <div class="cards">
+
+        <div class="card disabled">
+          <div class="card-top">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
+                <path d="M8 12h8M12 8v8"/>
+              </svg>
+            </div>
+            <div class="status" style="opacity:.6">
+              <div class="status-led"></div><span>non containerizzato</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-title">Torso &amp; Elettrodi</div>
+            <div class="card-desc">Generazione mesh torso e posizione elettrodi. MATLAB esterno, nessun container.</div>
+          </div>
+          <div class="card-meta">
+            <span class="badge">MATLAB</span>
+            <span class="badge">Stage 3</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VM3 -->
+    <div class="vm-section">
+      <div class="vm-label">VM3 — CDT Inference</div>
+      <div class="cards">
+
+        <a class="card" href="/cdt-framework/" target="_blank" rel="noopener"
+           data-health="/cdt/api/health">
+          <div class="card-top">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <div class="status checking" aria-live="polite">
+              <div class="status-led"></div><span>verifica...</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-title">CDT Inference</div>
+            <div class="card-desc">Inferenza parametri del digital twin (J. Camps). 20 GB shm, multiprocessing.</div>
+          </div>
+          <div class="card-meta">
+            <span class="badge">Jupyter</span>
+            <span class="badge accent">Stage 4</span>
+            <span class="open-lnk">Apri
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2.5 9.5l7-7M4 2.5h5.5v5.5"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="card" href="/cdt-framework/" target="_blank" rel="noopener">
+          <div class="card-top">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="status" style="color:var(--muted)">
+              <div class="status-led"></div><span>stesso host</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-title">openCARP Export</div>
+            <div class="card-desc">Traduzione al monodominio e preparazione file per le simulazioni openCARP.</div>
+          </div>
+          <div class="card-meta">
+            <span class="badge">Python</span>
+            <span class="badge accent">Stage 4b</span>
+            <span class="open-lnk">Apri
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2.5 9.5l7-7M4 2.5h5.5v5.5"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <span class="foot-text">Cardiac Digital Twin Pipeline</span>
+      <div class="foot-links">
+        <a href="https://bitbucket.org/aneic/meshtool" target="_blank" rel="noopener">MeshTool</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Theme toggle ── */
+(function(){
+  const btn=document.querySelector('[data-theme-toggle]'),root=document.documentElement;
+  const sun='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  const moon='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  let d=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  root.setAttribute('data-theme',d);
+  const upd=()=>{btn.innerHTML=d==='dark'?sun:moon;btn.setAttribute('aria-label','Passa a tema '+(d==='dark'?'chiaro':'scuro'))};
+  upd();
+  btn.addEventListener('click',()=>{d=d==='dark'?'light':'dark';root.setAttribute('data-theme',d);upd()});
+})();
+
+/* ── Health check per ogni card ── */
+document.querySelectorAll('.card[data-health]').forEach(card=>{
+  const url=card.dataset.health;
+  const pill=card.querySelector('.status');
+  const lbl=pill.querySelector('span');
+  fetch(url,{signal:AbortSignal.timeout(4000)})
+    .then(r=>{
+      pill.className='status '+(r.ok||r.redirected?'online':'offline');
+      lbl.textContent=r.ok||r.redirected?'online':'errore '+r.status;
+    })
+    .catch(()=>{
+      pill.className='status offline';
+      lbl.textContent='non raggiungibile';
+    });
+});
+</script>
+</body>
+</html>

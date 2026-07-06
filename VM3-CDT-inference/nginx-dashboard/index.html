@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cardiac Digital Twin — Pipeline Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="wrapper header-inner">
+    <div class="logo">
+      <img src="/icon-ecg-80.png" width="40" height="40" alt="CDT logo" aria-hidden="false" loading="eager" style="border-radius:7px;"/>
+      <div>
+        <div class="logo-text">Cardiac Digital Twin Personalization Pipeline</div>
+        <div class="logo-sub">Pipeline Dashboard</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="refresh-info">Status Updated: <span id="last-refresh">—</span></span>
+      <button class="icon-btn" id="btn-refresh" title="Aggiorna stato servizi" aria-label="Aggiorna">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Pipeline breadcrumb -->
+<div class="wrapper">
+  <nav class="pipeline-bar" aria-label="Pipeline Stages">
+    <h2>Pipeline Stages</h2>
+    <div class="steps" role="list">
+      <div class="step" role="listitem">
+        <span class="step-num">1</span><span class="step-label">Mesh reconstruction</span>
+      </div>
+      <div class="step-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="step" role="listitem">
+        <span class="step-num">2</span><span class="step-label">CobiVeco / Fibers</span>
+      </div>
+      <div class="step-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="step" role="listitem">
+        <span class="step-num">3</span><span class="step-label">CDT Inference</span>
+      </div>
+      <div class="step-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="step" role="listitem">
+        <span class="step-num">4</span><span class="step-label">Monodomain translation</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Service grid -->
+  <main>
+    <div class="grid" role="list">
+
+      <!-- Stage 1 — BiV-ME -->
+      <article class="service-card" data-step="1" role="listitem">
+        <div class="card-stripe"></div>
+        <div class="card-head">
+          <div>
+            <div class="card-title">Volumetric mesh reconstruction</div>
+            <div class="card-stage">Stage 1</div>
+          </div>
+          <span class="vm-flag vm1">
+            <svg viewBox="0 0 10 10"><rect width="10" height="10" rx="2"/></svg>
+            VM2
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Segmentation of CMR images and reconstruction of biventricular volumetric mesh using python pipeline Biv-Me</p>
+          <div class="tool-used-row">
+            <span class="tool-used-label">TOOLS USED:</span>
+            <div class="tool-used-values">
+              <span>BIV-ME python framework</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="dot checking" id="dot-bivme"></span>
+          <span class="status-label" id="status-bivme">verifica…</span>
+          <span class="tool-badge">JUPYTER SERVER</span>
+        </div>
+        <div class="card-footer">
+          <a class="open-btn" id="open-bivme" href="/biv-me/lab/" target="_blank" rel="noopener">
+            Open
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Stage 2 — CobiVeco -->
+      <article class="service-card" data-step="2" role="listitem">
+        <div class="card-stripe matlab"></div>
+        <div class="card-head">
+          <div>
+            <div class="card-title">Cobiveco and Cardiac Fibers generation</div>
+            <div class="card-stage">Stage 2</div>
+          </div>
+          <span class="vm-flag vm2">
+            <svg viewBox="0 0 10 10"><rect width="10" height="10" rx="2"/></svg>
+            VM2
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Computation of CobiVeco coordinates and Cardiac Fibers on the mesh, using Matlab tools</p>
+          <div class="tool-used-row">
+            <span class="tool-used-label">TOOLS USED:</span>
+            <div class="tool-used-values">
+              <span>COBIVECO and LDRB_Fibers Matlab Tools</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="dot checking" id="dot-cobiveco"></span>
+          <span class="status-label" id="status-cobiveco">verifica…</span>
+          <span class="tool-badge matlab">MATLAB</span>
+        </div>
+        <div class="card-footer">
+          <a class="open-btn" id="open-cobiveco" href="/matlab/" target="_blank" rel="noopener">
+            Open
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Stage 4 — CDT Inference -->
+      <article class="service-card" data-step="4" role="listitem">
+        <div class="card-stripe vm3"></div>
+        <div class="card-head">
+          <div>
+            <div class="card-title">Functional Twinning phase</div>
+            <div class="card-stage">Stage 3</div>
+          </div>
+          <span class="vm-flag vm3">
+            <svg viewBox="0 0 10 10"><rect width="10" height="10" rx="2"/></svg>
+            VM3
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Inference of activation and repolarization properties using the Cardiac Digital Twin Python Framework.</p>
+          <div class="tool-used-row">
+            <span class="tool-used-label">TOOLS USED:</span>
+            <div class="tool-used-values">
+              <span>Cardiac Digital Twin python Framework</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="dot checking" id="dot-cdt"></span>
+          <span class="status-label" id="status-cdt">verifica…</span>
+          <span class="tool-badge vm3">JUPYTER SERVER</span>
+        </div>
+        <div class="card-footer">
+          <a class="open-btn" id="open-cdt" href="/cdt-framework/lab/" target="_blank" rel="noopener">
+            Open
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Stage 5 — openCARP -->
+      <article class="service-card" data-step="5" role="listitem">
+        <div class="card-stripe vm4"></div>
+        <div class="card-head">
+          <div>
+            <div class="card-title">Translation to Monodomain simulations</div>
+            <div class="card-stage">Stage 4</div>
+          </div>
+          <span class="vm-flag vm4">
+            <svg viewBox="0 0 10 10"><rect width="10" height="10" rx="2"/></svg>
+            VM3
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Execution of monodomain simulation for the best inferred parameters using openCARP simulator</p>
+          <div class="tool-used-row">
+            <span class="tool-used-label">TOOLS USED:</span>
+            <div class="tool-used-values">
+              <span>OpenCARP containers</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="dot checking" id="dot-opencarp"></span>
+          <span class="status-label" id="status-opencarp">verifica…</span>
+          <span class="tool-badge vm4">JUPYTER SERVER</span>
+        </div>
+        <div class="card-footer">
+          <a class="open-btn" id="open-opencarp" href="/glance/" target="_blank" rel="noopener">
+            Apri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <footer>
+  </footer>
+</div>
+<script src="./dashboard.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: cdt-nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-proxy/nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx-dashboard:/usr/share/nginx/dashboard:ro
+    extra_hosts:
+      - "vm1:${VM1_IP}"
+      - "vm2:${VM2_IP}"   # IP della VM2 (MATLAB)
+      - "vm3:${VM3_IP}"   # IP della VM3 (CDT)
+
+  cdt-framework:
+    image: fedeo/cdt-framework:jupyter
+    container_name: cdt-framework
+    restart: unless-stopped
+    shm_size: "20gb"
+    ports:
+      - "8989:8888"
+    volumes:
+      - /data/Cardiac-Digital-Twin:/data/Cardiac-Digital-Twin
+      - /mnt:/mnt
+    environment:
+      - CDT_FRAMEWORK_PATH=/data/Cardiac-Digital-Twin
+      #- OMP_NUM_THREADS=4
+      #- JOBLIB_TEMP_FOLDER=/dev/shm
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  paraview-glance:
+    build:
+      context: ./glance-docker/
+      dockerfile: Dockerfile
+    image: cdt-glance:latest
+    container_name: paraview-glance
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - /data/:/data/:ro
+      - /mnt/:/mnt/:ro
