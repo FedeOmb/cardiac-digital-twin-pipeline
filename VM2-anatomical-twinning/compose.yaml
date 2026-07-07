@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  bivme:
+    image: fedeo/biv-me:cpu-gui-mt-jupyter-deps
+    container_name: biv-me
+    stdin_open: true
+    user: "${UID}:${GID}"
+    restart: unless-stopped
+    volumes: 
+      - "/data/biv-me:/biv-me"
+    ports: 
+      - "8090:8090"
+      - "8095:8095"
+
+  cobiveco:
+    image: fedeo/cobiveco-matlab:v8-deps-only
+    container_name: cobiveco-matlab
+    stdin_open: true
+    restart: unless-stopped
+    shm_size: "512m"
+    volumes: 
+      - "/data/biv-me:/data/biv-me"
+      - "/data/Cobiveco:/home/matlab/cobiveco"
+    environment:
+      - MWI_BASE_URL=/matlab
+      - MWI_APP_HOST=0.0.0.0
+    ports: 
+      - "8099:8888"
+    command: ["-browser"]
