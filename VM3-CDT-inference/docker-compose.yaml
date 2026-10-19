@@ -23,9 +23,12 @@ services:
       - "8989:8888"
     volumes:
       - /data/Cardiac-Digital-Twin:/data/Cardiac-Digital-Twin
-      - /mnt:/mnt
+      - /mnt/cardiac-data:/mnt/cardiac-data
+      - /mnt/data-vm2:/mnt/data-vm2
     environment:
       - CDT_FRAMEWORK_PATH=/data/Cardiac-Digital-Twin
+      - VM1_DATA_PATH=/mnt/cardiac-data
+      - VM2_DATA_PATH=/mnt/data-vm2
       #- OMP_NUM_THREADS=4
       #- JOBLIB_TEMP_FOLDER=/dev/shm
     ulimits:
