@@ -27,9 +27,9 @@ const SERVICES = [
   },
   {
     id:        "opencarp",
-    healthUrl: "/glance/",
-    openUrl:   "/glance/",
-    method:    "HEAD",
+    healthUrl: "/monodomain/api",
+    openUrl:   "/monodomain/lab/",
+    method:    "GET",
   },
 ];
 
